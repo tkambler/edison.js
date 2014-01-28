@@ -1,7 +1,7 @@
 define(function(require) {
 
 	var _ = require('underscore'),
-		RouteSandbox = require('./routesandbox');
+		Sandbox = require('./sandbox');
 
 	/**
 	 * @class Route
@@ -20,10 +20,7 @@ define(function(require) {
 		self.section = section;
 		self.callback = options.callback;
 		self.extensions = options.extend;
-		self.template = options.template;
-		self.templateData = options.templateData || null;
-		self.template_container_selector = '#child-route-container';
-		self.compiled_template = null;
+		self.template = options.template || "<div></div>";
 		self.cleanup = options.cleanup;
 
 		self.log = function() {
@@ -42,7 +39,12 @@ define(function(require) {
 
 		self.log('New route defined: ' + self.getPath());
 
-		self.sandbox = new RouteSandbox();
+		_.each(edison.getRouteExtensions(), function(ext) {
+			_.extend(Sandbox.prototype, ext);
+		});
+
+		self.sandbox = new Sandbox();
+		self.sandbox.section = section.getSandbox();
 
 		self.init = function(fn) {
 			options.init.call(self.sandbox, fn);
@@ -54,38 +56,15 @@ define(function(require) {
 			};
 		});
 
-		self.getDefaultTemplate = function(callback) {
-			var template = Router.getTemplate(self.template);
-			if ( !template ) {
-				template = '<div></div>';
-				self.compiled_template = Handlebars.compile(template);
-			} else {
-				self.compiled_template = template;
-			}
-			var template_container = $(self.template_container_selector);
-			if ( $(template_container).size() !== 1 ) {
-				throw 'Unable to locate template container: ' + self.template_container_selector;
-			}
-			var template_data = {};
-			if ( _.isFunction(self.templateData) ) {
-				self.templateData.call(self, function(template_data) {
-					var templateObj = $(self.compiled_template(template_data));
-					$(templateObj).addClass('section_' + section.getName());
-					$(templateObj).addClass('route_' + self.name);
-					$(template_container).html(templateObj);
-					callback();
-				});
-			} else {
-				var templateObj = $(self.compiled_template(template_data));
-				$(templateObj).addClass('section_' + section.getName());
-				$(templateObj).addClass('route_' + self.name);
-				$(template_container).html(templateObj);
-				callback();
-			}
+		self.loadTemplate = function() {
+			var $tpl = $(self.template);
+			$tpl.attr('id', 'section_' + self.section.getName() + '_route_' + self.name);
+			edison.insertTemplate($tpl);
 		};
 
-		self.initRoute = function() {
-			RouteSandbox.prototype.container = $('.section_' + self.section.getName() + '.route_' + self.name);
+		self.initRoute = function(id) {
+			self.loadTemplate();
+			Sandbox.prototype.container = $('#section_' + self.section.getName() + '_route_' + self.name);
 			if ( edison.getActiveSection() !== self.section ) {
 				// The user is making their first entry into this section.
 				self.log('Initial entry into section: ' + section.getName());
@@ -95,7 +74,7 @@ define(function(require) {
 			}
 			edison.setActiveSection(self.section);
 			edison.setActiveRoute(self.api);
-			self.callback.call(self.sandbox);
+			self.callback.call(self.sandbox, id);
 		};
 
 		/**
@@ -110,9 +89,6 @@ define(function(require) {
 			},
 			getName: function() {
 				return self.name;
-			},
-			getDefaultTemplate: function() {
-				self.getDefaultTemplate.apply(self, arguments);
 			},
 			init: function() {
 				self.init.apply(self, arguments);

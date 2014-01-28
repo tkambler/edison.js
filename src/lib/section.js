@@ -2,7 +2,7 @@ define(function(require) {
 
 	var _ = require('underscore'),
 		Route = require('./route'),
-		SectionSandbox = require('./sectionsandbox');
+		Sandbox = require('./sandbox');
 
 	/**
 	 * @class Section
@@ -30,12 +30,13 @@ define(function(require) {
 
 		self.log('New Backbone controller defined: ' + self.name);
 
-		self.sandbox = new SectionSandbox(this);
-		_.each(self.extensions, function(fnc, extname) {
-			self.sandbox[extname] = function() {
-				fnc.apply(self.sandbox, arguments);
-			};
+		_.each(edison.getRouteExtensions(), function(ext) {
+			_.extend(Sandbox.prototype, ext);
 		});
+
+		_.extend(Sandbox.prototype, self.extensions);
+
+		self.sandbox = new Sandbox(this);
 
 		self.getDefaultTemplate = function(load_section_template, fn) {
 			if ( load_section_template ) {
@@ -103,6 +104,9 @@ define(function(require) {
 				if ( _.isFunction(self.cleanup) ) {
 					self.cleanup.call(self.sandbox);
 				}
+			},
+			getSandbox: function() {
+				return self.sandbox;
 			}
 		};
 

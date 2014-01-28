@@ -3,15 +3,35 @@ define(function(require) {
 	var _ = require('underscore'),
 		Section = require('./section'),
 		Route = require('./route'),
-		Router = require('./router'),
-		UMDRouter = require('./umdrouter');
+		Router = require('./router');
 
 	var Edison = function() {
+		this.init.apply(this, _.toArray(arguments));
+		return {
+			'createSection': this.createSection.bind(this),
+			'initRoutes': this.initRoutes.bind(this),
+			'extendRoutes': this.extendRoutes.bind(this)
+		};
 	};
 
 	_.extend(Edison.prototype, {
 
-		'init': function() {
+		'init': function(options) {
+			options = options || {};
+			_.defaults(options, this.options);
+			this.options = options;
+			if ( !options.route_container ) {
+				throw 'A value must be specified for `route_container.`';
+			} else {
+				this.route_container = document.getElementById(options.route_container);
+				if ( ! this.route_container ) {
+					throw 'Specified route container does not exist: `' + options.route_container + '.`';
+				}
+			}
+		},
+
+		'options': {
+			'route_container': null
 		},
 
 		'debug': true,
@@ -31,6 +51,8 @@ define(function(require) {
 		'active_route': null,
 
 		'Routes': null,
+
+		'route_extensions': [],
 
 		'log': function() {
 			if ( !this.debug ) {
@@ -117,12 +139,13 @@ define(function(require) {
 			}
 
 			this.checkParentSection(data.section_name);
-			route.init(function() {
-				route.initRoute();
+			route.init(function(err) {
+				if ( err ) {
+					// todo - ?
+				} else {
+					route.initRoute(data.route_id);
+				}
 			});
-		},
-
-		'launchRoute': function(section_name, route_name, params) {
 		},
 
 		'navigate': function(route, leave_history) {
@@ -179,6 +202,21 @@ define(function(require) {
 
 		'getRoutes': function() {
 			return this.Routes;
+		},
+
+		'insertTemplate': function(template) {
+			$(this.route_container).html(template);
+		},
+
+		'extendRoutes': function(ext) {
+			if ( !_.isObject(ext) ) {
+				throw 'Invalid extension(s) specified: expected an object.';
+			}
+			this.route_extensions.push(ext);
+		},
+
+		'getRouteExtensions': function() {
+			return this.route_extensions;
 		}
 
 	});

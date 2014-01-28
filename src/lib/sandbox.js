@@ -1,12 +1,13 @@
 define(function(require) {
 
-	var _ = require('underscore');
+	var _ = require('underscore'),
+		MicroEvent = require('./microevent');
 
-	var RouteSandbox = function(route) {
+	var Sandbox = function(route) {
 		this.route = route;
 	};
 
-	_.extend(RouteSandbox.prototype, {
+	_.extend(Sandbox.prototype, {
 
 		'get': function(key) {
 			return this.route.getParameters[key];
@@ -49,6 +50,8 @@ define(function(require) {
 
 	});
 
-	return RouteSandbox;
+	MicroEvent.mixin(Sandbox.prototype);
+
+	return Sandbox;
 
 });

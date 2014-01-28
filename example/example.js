@@ -1,14 +1,27 @@
 require(['Edison'], function(Edison) {
 
-	var edison = new Edison();
+	var edison = new Edison({
+		'route_container': 'route-container'
+	});
+
+	edison.extendRoutes({
+		'test': function() {
+			console.log('TEST!');
+		}
+	});
 
 	var dashboard = edison.createSection({
 		'name': 'dashboard',
 		'callback': function() {
 			console.log('I am the dashboard section.');
+			this.test();
+			this.bargle();
+			this.name = 'tim';
+			console.log('name1', this.name);
 		},
 		'extend': {
-			'test': function() {
+			'bargle': function() {
+				console.log('hurgle');
 			}
 		},
 		'cleanup': function() {
@@ -18,9 +31,20 @@ require(['Edison'], function(Edison) {
 
 	dashboard.createRoute({
 		'name': 'index',
-		'callback': function() {
+		'template': "<div>I am an awesome route.</div>",
+		'init': function(fn) {
+			console.log('dashboard/index init');
+			fn();
+		},
+		'callback': function(id) {
 			console.log('I am the dashboard/index route.');
+			console.log('id', id);
 			this.herp();
+			console.log('container', this.container);
+			this.container.html('aaah!');
+			this.test();
+			console.log('this', this);
+			console.log('name2', this.section.name);
 		},
 		'extend': {
 			'herp': function() {
@@ -36,6 +60,7 @@ require(['Edison'], function(Edison) {
 		'name': 'test',
 		'callback': function() {
 			console.log('I am the dashboard/test route.');
+			this.test();
 		},
 		'extend': {
 			'herp': function() {
