@@ -1,0 +1,30 @@
+{
+  "name": "EdisonJS",
+  "version": "1.0.2",
+  "homepage": "https://github.com/tkambler/edison.js",
+  "authors": [
+    "Tim Ambler <tkambler@gmail.com> (http://bitcubby.com)"
+  ],
+  "description": "Navigation library for single-page applications.",
+  "main": "src/main.js",
+  "keywords": [
+    "router",
+    "navigation",
+    "hashbang",
+    "pushstate",
+    "hash-bang",
+    "history",
+    "url"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "underscore": "~1.5.2"
+  }
+}
