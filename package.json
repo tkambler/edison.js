@@ -1,0 +1,27 @@
+{
+  "name": "Edison",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/edison.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://tkambler@github.com/tkambler/edison.js"
+  },
+  "keywords": [
+  ],
+  "author": "Tim Ambler <tkambler@gmail.com> (http://bitcubby.com/)",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tkambler/edison.js/issues"
+  },
+  "devDependencies": {
+    "grunt": "~0.4.2",
+    "grunt-contrib-uglify": "~0.2.7",
+    "express": "~3.4.7",
+    "grunt-express-server": "~0.4.11",
+    "grunt-contrib-watch": "~0.5.3"
+  }
+}
