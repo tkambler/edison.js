@@ -117,8 +117,6 @@ define(function(require) {
 			}
 
 			this.checkParentSection(data.section_name);
-			this.setActiveSection(section);
-			this.setActiveRoute(route);
 			route.init(function() {
 				route.initRoute();
 			});

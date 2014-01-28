@@ -25,10 +25,6 @@ define(function(require) {
 		self.template_container_selector = '#child-route-container';
 		self.compiled_template = null;
 		self.cleanup = options.cleanup;
-		self.defineModel = options.defineModel;
-		self.model = null;
-		self.actions = null;
-		self.notice = null;
 
 		self.log = function() {
 			if ( !edison.getDebug() ) {
@@ -44,9 +40,7 @@ define(function(require) {
 			return section.getName() + '/' + self.name;
 		};
 
-		self.log('New Backbone route defined: ' + self.getPath());
-
-		self.getParameters = {};
+		self.log('New route defined: ' + self.getPath());
 
 		self.sandbox = new RouteSandbox();
 
@@ -90,40 +84,6 @@ define(function(require) {
 			}
 		};
 
-		self.createNotification = function() {
-			if ( _.empty(self.notice) || !_.isObject(self.notice) ) {
-				$("#notification-container").hide();
-				return;
-			}
-			Widget.getWidget('Alert', self.notice, function(obj, api) {
-				$("#notification-container", self.container).html(obj);
-				$("#notification-container").show();
-			});
-		};
-
-		self.createActions = function() {
-			if ( _.empty(self.actions) ) {
-				$("#actions-container .bts").html(null);
-				$("#actions-container").show();
-			} else {
-				$("#actions-container .bts").html(null);
-				_.each(self.actions, function(action, k) {
-					var bt = $("<button class='btn btn-white btn-small' id='btn-1' href='#btn-1'><i class='text'></i> <span class='text'></span></button>");
-					$('span.text', bt).html(action.label);
-					if ( !_.empty(action.icon) ) {
-						$('i.text', bt).addClass(action.icon);
-					}
-					if ( _.isFunction(action.onClick) ) {
-						$(bt).on('click', function(e) {
-							action.onClick();
-						});
-					}
-					$("#actions-container .bts").append(bt);
-				});
-				$("#actions-container").show();
-			}
-		};
-
 		self.initRoute = function() {
 			RouteSandbox.prototype.container = $('.section_' + self.section.getName() + '.route_' + self.name);
 			if ( edison.getActiveSection() !== self.section ) {
@@ -135,36 +95,7 @@ define(function(require) {
 			}
 			edison.setActiveSection(self.section);
 			edison.setActiveRoute(self.api);
-			self.getModel(function() {
-				self.callback.call(self.sandbox);
-			});
-		};
-
-		self.getModel = function(fn) {
-			if ( !_.isFunction(options.defineModel) ) {
-				fn();
-				return;
-			}
-			var d = options.defineModel.call(self.sandbox);
-			if ( _.isEmpty(d) ) {
-				fn();
-				return;
-			}
-			self.model = new window[d.model]({
-				_id: d.id
-			});
-			self.model.fetch({
-				success: function() {
-					self.sandbox.model = self.model;
-					fn();
-				},
-				failure: function() {
-				}
-			});
-		};
-
-		self.setGetParameters = function(obj) {
-			self.getParameters = obj;
+			self.callback.call(self.sandbox);
 		};
 
 		/**
@@ -188,9 +119,6 @@ define(function(require) {
 			},
 			initRoute: function() {
 				self.initRoute.apply(self, arguments);
-			},
-			setGetParameters: function() {
-				self.setGetParameters.apply(self, arguments);
 			},
 			getTitle: function() {
 				return self.title;

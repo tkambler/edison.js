@@ -1,7 +1,8 @@
 define(function(require) {
 
 	var _ = require('underscore'),
-		Route = require('./route');
+		Route = require('./route'),
+		SectionSandbox = require('./sectionsandbox');
 
 	/**
 	 * @class Section
@@ -9,6 +10,7 @@ define(function(require) {
 	var Section = function(options, edison) {
 
 		var self = this;
+		self.edison = edison;
 		self.name = options.name;
 		self.controller = options.controller;
 		self.callback = options.callback;
@@ -28,21 +30,12 @@ define(function(require) {
 
 		self.log('New Backbone controller defined: ' + self.name);
 
-		self.sandbox = {};
+		self.sandbox = new SectionSandbox(this);
 		_.each(self.extensions, function(fnc, extname) {
 			self.sandbox[extname] = function() {
 				fnc.apply(self.sandbox, arguments);
 			};
 		});
-		self.sandbox.setInterval = function(fn, interval) {
-			Router.createParentSectionInterval(fn, interval);
-		};
-		self.sandbox.request = function(method, post, callback) {
-			var url = '/' + self.controller + '/' + method;
-			$.post(url, post, function(result) {
-				callback(result);
-			}, 'json');
-		};
 
 		self.getDefaultTemplate = function(load_section_template, fn) {
 			if ( load_section_template ) {

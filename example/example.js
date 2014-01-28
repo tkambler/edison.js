@@ -1,21 +1,3 @@
-requirejs.config({
-	'baseUrl': '/',
-	'paths': {
-		'underscore': 'vendor/underscore/underscore'
-	},
-	'shim': {
-		'underscore': {
-			'exports': '_'
-		}
-	},
-	'packages': [
-		{
-			'name': 'Edison',
-			'location': 'edison'
-		}
-	]
-});
-
 require(['Edison'], function(Edison) {
 
 	var edison = new Edison();
@@ -38,6 +20,7 @@ require(['Edison'], function(Edison) {
 		'name': 'index',
 		'callback': function() {
 			console.log('I am the dashboard/index route.');
+			this.herp();
 		},
 		'extend': {
 			'herp': function() {
@@ -46,6 +29,21 @@ require(['Edison'], function(Edison) {
 		},
 		'cleanup': function() {
 			console.log('dashboard/index route is cleaning up.');
+		}
+	});
+
+	dashboard.createRoute({
+		'name': 'test',
+		'callback': function() {
+			console.log('I am the dashboard/test route.');
+		},
+		'extend': {
+			'herp': function() {
+				console.log('dashboard/test is herping');
+			}
+		},
+		'cleanup': function() {
+			console.log('dashboard/test route is cleaning up.');
 		}
 	});
 
