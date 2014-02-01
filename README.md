@@ -1,20 +1,7 @@
 EdisonJS
 =========
 
-EdisonJS is a simple, extendable JavaScript routing library with a focus on organization. EdisonJS encourages the developer to organize their application as a series of "sections" and underlying "routes."
-
-EdisonJS encourages the developer to organize their application's routes
-
-```html
-<!DOCTYPE html>
-<html>
-<body>
-<div id="route_container">
-	<!-- When a route is loaded, its contents will be inserted here. -->
-</div>
-</body>
-</html>
-```
+Most JavaScript routing libraries provide little to no guidance in terms of how one might best go about organizing complex single-page applications with many routes. EdisonJS seeks to simplify the organizational structure of complex single-page applications by encouraging developers to organize their applications as a series of parent ("section") <-> child ("route") relationships. The result is a simple, clean, and powerful organizational structure. Let's look at an example:
 
 ## Using EdisonJS
 
@@ -27,10 +14,6 @@ var edison = new Edison({
 	'container': 'route_container'
 });
 ```
-
-### Sections and Routes
-
-Most JavaScript routing libraries provide little to no guidance in terms of how one might best go about organizing complex single-page applications with many routes. EdisonJS seeks to simplify the organizational structure of complex single-page applications by encouraging developers to organize their applications as a series of parent ("section") <-> child ("route") relationships. The result is a simple, clean, and powerful organizational structure. Let's look at an example:
 
 ### Creating a Section
 
