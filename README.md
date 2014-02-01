@@ -186,6 +186,14 @@ users.createRoute({
 });
 ```
 
+### One More Thing
+
+Once all of your sections and routes have been defined, you should call the following method:
+
+```javascript
+edison.initRoutes();
+```
+
 ## Installation
 
 ### Bower
