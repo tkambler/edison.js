@@ -1,7 +1,7 @@
 EdisonJS
 =========
 
-Most JavaScript routing libraries provide little to no guidance in terms of how one might best go about organizing complex single-page applications with many routes. EdisonJS seeks to simplify the organizational structure of complex single-page applications by encouraging developers to organize their applications as a series of parent ("section") <-> child ("route") relationships. The result is a simple, clean, and powerful organizational structure. Let's look at an example:
+Most JavaScript routing libraries provide little to no guidance in terms of how one might best go about organizing complex single-page applications with many routes. EdisonJS seeks to simplify the organizational structure of complex single-page applications by encouraging developers to organize their applications as a series of parent ("section") <-> child ("route") relationships. The result is a simple, clean, and powerful organizational structure.
 
 ## Using EdisonJS
 
