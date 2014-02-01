@@ -1,10 +1,10 @@
-require(['Edison'], function(Edison) {
+require(['edison'], function(Edison) {
 
 	var edison = new Edison({
-		'route_container': 'route-container'
+		'container': 'route-container'
 	});
 
-	edison.extendRoutes({
+	edison.extend({
 		'test': function() {
 			console.log('TEST!');
 		}
@@ -40,8 +40,9 @@ require(['Edison'], function(Edison) {
 			console.log('I am the dashboard/index route.');
 			console.log('id', id);
 			this.herp();
+			console.log('test', this.get('test'));
 			console.log('container', this.container);
-			this.container.html('aaah!');
+			this.container.innerHTML = 'aaah!';
 			this.test();
 			console.log('this', this);
 			console.log('name2', this.section.name);

@@ -28,8 +28,6 @@ define(function(require) {
 			console.log(arguments);
 		};
 
-		self.log('New Backbone controller defined: ' + self.name);
-
 		_.each(edison.getRouteExtensions(), function(ext) {
 			_.extend(Sandbox.prototype, ext);
 		});
@@ -37,29 +35,6 @@ define(function(require) {
 		_.extend(Sandbox.prototype, self.extensions);
 
 		self.sandbox = new Sandbox(this);
-
-		self.getDefaultTemplate = function(load_section_template, fn) {
-			if ( load_section_template ) {
-				var tpl;
-				if ( _.isString(self.template) && !_.empty(self.template) ) {
-					tpl = Router.getTemplate(self.template);
-				} else {
-					tpl = Handlebars.compile("<div id='child-route-container'></div>");
-				}
-				var template;
-				if ( _.isFunction(self.templateData) ) {
-					self.templateData(function(data) {
-						template = $(tpl(data));
-						$("#route-container").html(template);
-					});
-				} else {
-					template = $(tpl());
-					$("#route-container").html(template);
-				}
-			} else {
-			}
-			fn();
-		};
 
 		self.api = {
 			createRoute: function(options) {
@@ -96,9 +71,6 @@ define(function(require) {
 			},
 			getParentSection: function() {
 				return self.parent_section;
-			},
-			getDefaultTemplate: function(load_section_template, fn) {
-				return self.getDefaultTemplate(load_section_template, fn);
 			},
 			cleanup: function() {
 				if ( _.isFunction(self.cleanup) ) {

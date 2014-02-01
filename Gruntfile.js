@@ -30,13 +30,33 @@ module.exports = function(grunt) {
                     'spawn': false
                 }
             }
-        }
+        },
+		'requirejs': {
+			'minified': {
+				'options': {
+					'baseUrl': '.',
+					'name': 'edison',
+					'out': 'dist/edison.min.js',
+					'optimize': 'uglify',
+					'mainConfigFile': 'require.config.build.js'
+				}
+			},
+			'unminified': {
+				'options': {
+					'baseUrl': '.',
+					'name': 'edison',
+					'out': 'dist/edison.js',
+					'optimize': 'none',
+					'mainConfigFile': 'require.config.build.js'
+				}
+			}
+		}
     });
 
     grunt.loadNpmTasks('grunt-contrib-uglify');
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-express-server');
-
+    grunt.loadNpmTasks('grunt-contrib-requirejs');
 
     // Default task(s).
     grunt.registerTask('default', ['uglify']);

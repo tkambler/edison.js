@@ -57,14 +57,15 @@ define(function(require) {
 		});
 
 		self.loadTemplate = function() {
-			var $tpl = $(self.template);
-			$tpl.attr('id', 'section_' + self.section.getName() + '_route_' + self.name);
-			edison.insertTemplate($tpl);
+			var tpl = document.createElement('div');
+			tpl.innerHTML = self.template;
+			tpl.setAttribute('id', 'section_' + self.section.getName() + '_route_' + self.name);
+			edison.insertTemplate(tpl);
 		};
 
 		self.initRoute = function(id) {
 			self.loadTemplate();
-			Sandbox.prototype.container = $('#section_' + self.section.getName() + '_route_' + self.name);
+			Sandbox.prototype.container = document.getElementById('section_' + self.section.getName() + '_route_' + self.name);
 			if ( edison.getActiveSection() !== self.section ) {
 				// The user is making their first entry into this section.
 				self.log('Initial entry into section: ' + section.getName());

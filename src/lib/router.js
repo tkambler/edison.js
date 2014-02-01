@@ -66,8 +66,6 @@ define(function(require) {
 			} catch(e) {
 				return;
 			}
-//			console.log('onHashChange', data);
-//			console.log('processed', processed);
 			this.trigger('on_route', processed);
 		},
 

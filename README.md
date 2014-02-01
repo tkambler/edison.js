@@ -1,73 +1,250 @@
-Edison.js
+EdisonJS
 =========
 
-Edison.js is a rapid development framework that drastically simplifies the process of building scaleable single-page applications built on top of Backbone.js.
+EdisonJS is a simple, extendable JavaScript routing library with a focus on organization. EdisonJS encourages the developer to organize their application as a series of "sections" and underlying "routes."
 
-Applications built using Backbone and similar frameworks typically don't require full page reloads as the user navigates between different areas. That's a large part of the point. To facilitate this, Backbone provides a "Router" component:
+EdisonJS encourages the developer to organize their application's routes
 
-http://backbonejs.org/#Router
+```html
+<!DOCTYPE html>
+<html>
+<body>
+<div id="route_container">
+	<!-- When a route is loaded, its contents will be inserted here. -->
+</div>
+</body>
+</html>
+```
 
-The router allows you to pair URL paths with JavaScript functions to be called when they are accessed. For example:
+## Using EdisonJS
 
-	Router = Backbone.Router.extend({
-	    'routes': {
-	        'help': 'help'
-	    },
-	    'help': function() {
-	        // This function is called when someone accesses http://domain.com#help
-	    }
-	});
+### Creating a New Instance of EdisonJS
 
-That's great, and perhaps sufficient if you are building a small application. For anything non-trivial, building everything on top of this one low-level component will quickly become unmanageable. Imagine having a file where every section throughout the application is defined, along with the functionality attached to each section. And what if you want to bring in commonly used methods that are shared between sections? It's important to break this down into smaller components of related functionality. Backbone does not tell you how to do this. Edison.js provides you with a simple, opinionated approach with which you can quickly become affective.
+In this example, we create a new instance of EdisonJS and pass a single option - `container`. Each route that we define will have a template associated with it, and this option determines where those templates are inserted into our document.
 
-The follow example demonstrates the creation of a "controller" using Edison.js:
+```javascript
+var edison = new Edison({
+	'container': 'route_container'
+});
+```
 
-	/**
-	 * Here we define a "section" - a group of related areas within the app.
-	 */
-	var user = Router.createSection({
-	    'name': 'user',
-	    'callback': function() {
-	        /*
-	        This function is called once when the user enters this section. Navigating
-	        between routes within this section does not cause the function to fire multiple
-	        times. This provides you with a useful opportunity to do some section-wide setup.
-	        */
-	    }
-	});
+### Sections and Routes
 
-	/**
-	 * Here we define a "route" - a specific area of functionality within the app that falls
-	 * under the 'user' section. Given the name that we have specified below, you would
-	 * access this route at the following URL:
-	 *
-	 * http://domain.com/#user/settings
-	 */
-	user.createRoute({
-	    'name': 'settings',
-	    /**
-	     * This function is called every time the user accesses this route. Notice that little
-	     * to no actual functionality is implemented here. Instead, the route is broken down into
-	     * small functions within the 'extend' object. Organizing your code in this manner helps to
-	     * ensure that everything stays neatly organized and quickly understandable.
-	     */
-	    'callback': function() {
-	        this.message = 'Hello.';
-	        this.doThis();
-	        this.doThat();
-	    },
-	    'extend': {
-	        /**
-	         * This function will print 'Hello.' to the console. Notice that the `this.message`
-	         * variable retains its value between the initial callback that was fired when the user
-	         * entered this route, and when this extended function was called. Every route has a
-	         * shared "sandbox" from which to work.
-	         */
-	        'doThis': function() {
-	            console.log(this.message);
-	        },
-	        'doThat': function() {
-	            // Do something...
-	        }
-	    }
-	});
+Most JavaScript routing libraries provide little to no guidance in terms of how one might best go about organizing complex single-page applications with many routes. EdisonJS seeks to simplify the organizational structure of complex single-page applications by encouraging developers to organize their applications as a series of parent ("section") <-> child ("route") relationships. The result is a simple, clean, and powerful organizational structure. Let's look at an example:
+
+### Creating a Section
+
+A typical web application is comprised of many different "routes." EdisonJS encourages the developer to group related routes under a parent "section" as shown below:
+
+```javascript
+var users = edison.createSection({
+	'name': 'users', // Determines our URL structure
+	'callback': function() {
+		console.log("Welcome to the 'users' section.");
+	}
+});
+```
+
+When a user navigates to a route belonging to the "users" section for the first time, the section's callback function will be fired. As the user navigates between routes within the section, this callback function does not continue to fire. As a result, this callback function is useful for performing setup routines that related routes would typically have to perform on their own.
+
+### Creating a Route
+
+```javascript
+users.createRoute({
+	'name': 'list', // Determines our URL structure
+	'template': template, // A string containing this route's template
+	'callback': function() {
+		console.log("Welcome to the 'users/list' route.");
+	}
+});
+```
+
+With our first section and route defined, we can now navigate to the following URL:
+
+```html
+http://site.com/#users/list
+```
+
+In your console, you should now see the following messages:
+
+```javascript
+Welcome to the 'users' section.
+Welcome to the 'users/list' route.
+```
+
+### Passing Parameters
+
+Routes can accept a single `id` parameter as shown below:
+
+```javascript
+// URL: http://site.com/#users/list/5
+
+users.createRoute({
+	'name': 'list',
+	'template': template,
+	'callback': function(id) {
+		// id === 5
+	}
+});
+```
+
+For greater flexibility, you can also access query parameters directly, as shown below:
+
+```javascript
+// URL: http://site.com/#users/list?name=Joe
+
+users.createRoute({
+	'name': 'list',
+	'template': template,
+	'callback': function() {
+		var name = this.get('name'); // name === 'Joe'
+	}
+});
+```
+
+### Extending Sections
+
+Sections can extend their functionality as shown below. As a result, sections can remain organized as they inevitably grow more complex:
+
+```javascript
+var users = edison.createSection({
+	'name': 'users',
+	'callback': function() {
+		this.doSomething();
+	},
+	'extend': {
+		'doSomething': function() {
+			console.log("The 'users' section is doing something.");
+		}
+	}
+});
+```
+
+### Extending Routes
+
+In a similar manner, routes can also extend their functionality.
+
+```javascript
+users.createRoute({
+	'name': 'list',
+	'template': template,
+	'callback': function() {
+		this.list();
+	},
+	'extend': {
+		'list': function() {
+			console.log('I am listing.');
+		}
+	}
+});
+```
+
+### Accessing Section Functionality from Routes
+
+A route can access its parent section as shown below:
+
+```javascript
+var users = edison.createSection({
+	'name': 'users',
+	'callback': function() {
+		this.day = 'Tuesday';
+	},
+	'extend': {
+		'growl': function() {
+			console.log("The 'users' section is growling.");
+		}
+	}
+});
+
+users.createRoute({
+	'name': 'list',
+	'template': template,
+	'callback': function() {
+		var day = this.section.day;
+		this.section.growl();
+	}
+});
+```
+
+### Global Section and Route Extensions
+
+Functionality shared across all sections and routes throughout the application can be extended globally as shown below:
+
+```javascript
+edison.extend({
+	'request': function() {
+		/* All sections and routes can now call: this.request(); */
+	}
+});
+```
+
+### Cleanup Routines (Optional)
+
+If a section or route is given a `cleanup` method, it will be called when the user navigates to a different section or route. See below:
+
+```javascript
+var users = edison.createSection({
+	'name': 'users',
+	'callback': function() {
+	},
+	'cleanup': function() {
+		// Called when the user leaves this section.
+	}
+});
+
+users.createRoute({
+	'name': 'list',
+	'template': template,
+	'callback': function() {
+	},
+	'cleanup': function() {
+		// Called when the user leaves this route.
+	}
+});
+```
+
+## Installation
+
+### Bower
+
+```
+$ bower install edisonjs
+```
+
+## Configuration
+
+Add the following options to your RequireJS configuration (adjust `location` as appropriate):
+
+```javascript
+'packages': [
+	{
+		'name': 'edison',
+		'location': '/edison/dist/',
+		'main': 'edison'
+	}
+]
+```
+
+
+## License (MIT)
+
+```
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```

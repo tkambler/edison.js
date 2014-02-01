@@ -1,6 +1,6 @@
 {
   "name": "Edison",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "",
   "main": "dist/edison.js",
   "scripts": {
@@ -10,8 +10,7 @@
     "type": "git",
     "url": "https://tkambler@github.com/tkambler/edison.js"
   },
-  "keywords": [
-  ],
+  "keywords": [],
   "author": "Tim Ambler <tkambler@gmail.com> (http://bitcubby.com/)",
   "license": "MIT",
   "bugs": {
@@ -22,6 +21,7 @@
     "grunt-contrib-uglify": "~0.2.7",
     "express": "~3.4.7",
     "grunt-express-server": "~0.4.11",
-    "grunt-contrib-watch": "~0.5.3"
+    "grunt-contrib-watch": "~0.5.3",
+    "grunt-contrib-requirejs": "~0.4.1"
   }
 }

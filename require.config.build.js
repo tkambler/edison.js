@@ -1,7 +1,7 @@
 requirejs.config({
-	'baseUrl': '/',
+	'baseUrl': '.',
 	'paths': {
-		'underscore': 'vendor/underscore/underscore'
+		'underscore': 'bower_components/underscore/underscore'
 	},
 	'shim': {
 		'underscore': {
@@ -11,8 +11,7 @@ requirejs.config({
 	'packages': [
 		{
 			'name': 'edison',
-			'location': 'edison',
-			'main': 'edison'
+			'location': 'src'
 		}
 	]
 });

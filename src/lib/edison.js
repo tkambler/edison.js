@@ -10,7 +10,7 @@ define(function(require) {
 		return {
 			'createSection': this.createSection.bind(this),
 			'initRoutes': this.initRoutes.bind(this),
-			'extendRoutes': this.extendRoutes.bind(this)
+			'extend': this.extend.bind(this)
 		};
 	};
 
@@ -20,21 +20,21 @@ define(function(require) {
 			options = options || {};
 			_.defaults(options, this.options);
 			this.options = options;
-			if ( !options.route_container ) {
-				throw 'A value must be specified for `route_container.`';
+			if ( !options.container ) {
+				throw 'A value must be specified for `container.`';
 			} else {
-				this.route_container = document.getElementById(options.route_container);
+				this.route_container = document.getElementById(options.container);
 				if ( ! this.route_container ) {
-					throw 'Specified route container does not exist: `' + options.route_container + '.`';
+					throw 'Specified route container does not exist: `' + options.container + '.`';
 				}
 			}
 		},
 
 		'options': {
-			'route_container': null
+			'container': null
 		},
 
-		'debug': true,
+		'debug': false,
 
 		'routes_initialized': false,
 
@@ -164,22 +164,6 @@ define(function(require) {
 			this.active_route = route;
 		},
 
-		'getTemplate': function(tpl_id) {
-			if ( _.empty(tpl_id) ) {
-				return false;
-			}
-			var tpl_container = $("#rtpl_" + tpl_id);
-			if ( $(tpl_container).size() !== 1 ) {
-				return false;
-			}
-			var template = $(tpl_container).html();
-			try {
-				return Handlebars.compile(template);
-			} catch(e) {
-				return false;
-			}
-		},
-
 		'getDebug': function() {
 			return this.debug;
 		},
@@ -205,10 +189,11 @@ define(function(require) {
 		},
 
 		'insertTemplate': function(template) {
-			$(this.route_container).html(template);
+			this.route_container.innerHTML = '';
+			this.route_container.appendChild(template);
 		},
 
-		'extendRoutes': function(ext) {
+		'extend': function(ext) {
 			if ( !_.isObject(ext) ) {
 				throw 'Invalid extension(s) specified: expected an object.';
 			}

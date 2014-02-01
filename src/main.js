@@ -1,12 +1,6 @@
 /**
  * @package Edison
  */
-define(function(require) {
-
-	/**
-	 * @class Edison
-	 */
-	var Edison = require('./lib/edison');
-	return Edison;
-
+define('edison', function(require) {
+	return require('./lib/edison');
 });
