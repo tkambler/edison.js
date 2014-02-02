@@ -7,6 +7,16 @@ require(['edison'], function(Edison) {
 	edison.extend({
 		'test': function() {
 			console.log('TEST!');
+		},
+		'interval_ids': [],
+		'setInterval': function(fn, timeout) {
+			this.interval_ids.push(setInterval(fn, timeout));
+		}
+	});
+
+	edison.extendCleanup(function() {
+		for ( var i = 0; i < this.interval_ids.length; i++ ) {
+			clearInterval(this.interval_ids[i]);
 		}
 	});
 
@@ -44,6 +54,11 @@ require(['edison'], function(Edison) {
 			console.log('container', this.container);
 			this.container.innerHTML = 'aaah!';
 			this.test();
+
+			this.setInterval(function() {
+				console.log('hello');
+			}, 4000);
+
 			console.log('this', this);
 			console.log('name2', this.section.name);
 		},

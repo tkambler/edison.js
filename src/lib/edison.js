@@ -10,7 +10,8 @@ define(function(require) {
 		return {
 			'createSection': this.createSection.bind(this),
 			'initRoutes': this.initRoutes.bind(this),
-			'extend': this.extend.bind(this)
+			'extend': this.extend.bind(this),
+			'extendCleanup': this.extendCleanup.bind(this)
 		};
 	};
 
@@ -129,6 +130,9 @@ define(function(require) {
 			var previousRoute = this.getActiveRoute();
 			if ( previousRoute ) {
 				previousRoute.cleanup();
+				_.each(this.cleanupExtenders, function(ce) {
+					ce.call(previousRoute.getSandbox());
+				});
 			}
 
 			var previousSection = this.getActiveSection();
@@ -202,6 +206,15 @@ define(function(require) {
 
 		'getRouteExtensions': function() {
 			return this.route_extensions;
+		},
+
+		'cleanupExtenders': [],
+
+		'extendCleanup': function(fn) {
+			if ( !_.isFunction(fn) ) {
+				throw 'extendCleanup expects a single parameter: a callback function.';
+			}
+			this.cleanupExtenders.push(fn);
 		}
 
 	});
