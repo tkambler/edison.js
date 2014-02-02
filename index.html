@@ -1,0 +1,280 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>EdisonJS by tkambler</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="javascripts/scale.fix.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1 class="header">EdisonJS</h1>
+        <p class="header">Simplifies the organization of complex single-page apps by structuring them as a series of parent (&quot;section&quot;) &lt;-&gt; child (&quot;route&quot;) relationships. The result is a simple, clean, and powerful organizational structure.</p>
+
+        <ul>
+          <li class="download"><a class="buttons" href="https://github.com/tkambler/edison.js/zipball/master">Download ZIP</a></li>
+          <li class="download"><a class="buttons" href="https://github.com/tkambler/edison.js/tarball/master">Download TAR</a></li>
+          <li><a class="buttons github" href="https://github.com/tkambler/edison.js">View On GitHub</a></li>
+        </ul>
+
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/tkambler">tkambler</a></p>
+
+
+      </header>
+      <section>
+        <h1>
+<a name="edisonjs" class="anchor" href="#edisonjs"><span class="octicon octicon-link"></span></a>EdisonJS</h1>
+
+<p>Most JavaScript routing libraries provide little to no guidance in terms of how one might best go about organizing complex single-page applications with many routes. EdisonJS seeks to simplify the organizational structure of complex single-page applications by encouraging developers to organize their applications as a series of parent ("section") &lt;-&gt; child ("route") relationships. The result is a simple, clean, and powerful organizational structure.</p>
+
+<h2>
+<a name="using-edisonjs" class="anchor" href="#using-edisonjs"><span class="octicon octicon-link"></span></a>Using EdisonJS</h2>
+
+<h3>
+<a name="creating-a-new-instance-of-edisonjs" class="anchor" href="#creating-a-new-instance-of-edisonjs"><span class="octicon octicon-link"></span></a>Creating a New Instance of EdisonJS</h3>
+
+<p>In this example, we create a new instance of EdisonJS and pass a single option - <code>container</code>. Each route that we define will have a template associated with it, and this option determines where those templates are inserted into our document.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">edison</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Edison</span><span class="p">({</span>
+    <span class="s1">'container'</span><span class="o">:</span> <span class="s1">'route_container'</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="creating-a-section" class="anchor" href="#creating-a-section"><span class="octicon octicon-link"></span></a>Creating a Section</h3>
+
+<p>A typical web application is comprised of many different "routes." EdisonJS encourages the developer to group related routes under a parent "section" as shown below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">edison</span><span class="p">.</span><span class="nx">createSection</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'users'</span><span class="p">,</span> <span class="c1">// Determines our URL structure</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Welcome to the 'users' section."</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>When a user navigates to a route belonging to the "users" section for the first time, the section's callback function will be fired. As the user navigates between routes within the section, this callback function does not continue to fire. As a result, this callback function is useful for performing setup routines that related routes would typically have to perform on their own.</p>
+
+<h3>
+<a name="creating-a-route" class="anchor" href="#creating-a-route"><span class="octicon octicon-link"></span></a>Creating a Route</h3>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">users</span><span class="p">.</span><span class="nx">createRoute</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'list'</span><span class="p">,</span> <span class="c1">// Determines our URL structure</span>
+    <span class="s1">'template'</span><span class="o">:</span> <span class="nx">template</span><span class="p">,</span> <span class="c1">// A string containing this route's template</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Welcome to the 'users/list' route."</span><span class="p">);</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>With our first section and route defined, we can now navigate to the following URL:</p>
+
+<div class="highlight highlight-html"><pre>http://site.com/#users/list
+</pre></div>
+
+<p>In your console, you should now see the following messages:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">Welcome</span> <span class="nx">to</span> <span class="nx">the</span> <span class="s1">'users'</span> <span class="nx">section</span><span class="p">.</span>
+<span class="nx">Welcome</span> <span class="nx">to</span> <span class="nx">the</span> <span class="s1">'users/list'</span> <span class="nx">route</span><span class="p">.</span>
+</pre></div>
+
+<h3>
+<a name="passing-parameters" class="anchor" href="#passing-parameters"><span class="octicon octicon-link"></span></a>Passing Parameters</h3>
+
+<p>Routes can accept a single <code>id</code> parameter as shown below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// URL: http://site.com/#users/list/5</span>
+
+<span class="nx">users</span><span class="p">.</span><span class="nx">createRoute</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'list'</span><span class="p">,</span>
+    <span class="s1">'template'</span><span class="o">:</span> <span class="nx">template</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">id</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// id === 5</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<p>For greater flexibility, you can also access query parameters directly, as shown below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// URL: http://site.com/#users/list?name=Joe</span>
+
+<span class="nx">users</span><span class="p">.</span><span class="nx">createRoute</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'list'</span><span class="p">,</span>
+    <span class="s1">'template'</span><span class="o">:</span> <span class="nx">template</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">name</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><span class="s1">'name'</span><span class="p">);</span> <span class="c1">// name === 'Joe'</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="extending-sections" class="anchor" href="#extending-sections"><span class="octicon octicon-link"></span></a>Extending Sections</h3>
+
+<p>Sections can extend their functionality as shown below. As a result, sections can remain organized as they inevitably grow more complex:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">edison</span><span class="p">.</span><span class="nx">createSection</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'users'</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">doSomething</span><span class="p">();</span>
+    <span class="p">},</span>
+    <span class="s1">'extend'</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s1">'doSomething'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"The 'users' section is doing something."</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="extending-routes" class="anchor" href="#extending-routes"><span class="octicon octicon-link"></span></a>Extending Routes</h3>
+
+<p>In a similar manner, routes can also extend their functionality.</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">users</span><span class="p">.</span><span class="nx">createRoute</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'list'</span><span class="p">,</span>
+    <span class="s1">'template'</span><span class="o">:</span> <span class="nx">template</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">list</span><span class="p">();</span>
+    <span class="p">},</span>
+    <span class="s1">'extend'</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s1">'list'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">'I am listing.'</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="accessing-section-functionality-from-routes" class="anchor" href="#accessing-section-functionality-from-routes"><span class="octicon octicon-link"></span></a>Accessing Section Functionality from Routes</h3>
+
+<p>A route can access its parent section as shown below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">edison</span><span class="p">.</span><span class="nx">createSection</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'users'</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">day</span> <span class="o">=</span> <span class="s1">'Tuesday'</span><span class="p">;</span>
+    <span class="p">},</span>
+    <span class="s1">'extend'</span><span class="o">:</span> <span class="p">{</span>
+        <span class="s1">'growl'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"The 'users' section is growling."</span><span class="p">);</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">users</span><span class="p">.</span><span class="nx">createRoute</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'list'</span><span class="p">,</span>
+    <span class="s1">'template'</span><span class="o">:</span> <span class="nx">template</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">day</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">section</span><span class="p">.</span><span class="nx">day</span><span class="p">;</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">section</span><span class="p">.</span><span class="nx">growl</span><span class="p">();</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="global-section-and-route-extensions" class="anchor" href="#global-section-and-route-extensions"><span class="octicon octicon-link"></span></a>Global Section and Route Extensions</h3>
+
+<p>Functionality shared across all sections and routes throughout the application can be extended globally as shown below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">edison</span><span class="p">.</span><span class="nx">extend</span><span class="p">({</span>
+    <span class="s1">'request'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="cm">/* All sections and routes can now call: this.request(); */</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="cleanup-routines-optional" class="anchor" href="#cleanup-routines-optional"><span class="octicon octicon-link"></span></a>Cleanup Routines (Optional)</h3>
+
+<p>If a section or route is given a <code>cleanup</code> method, it will be called when the user navigates to a different section or route. See below:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="kd">var</span> <span class="nx">users</span> <span class="o">=</span> <span class="nx">edison</span><span class="p">.</span><span class="nx">createSection</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'users'</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="s1">'cleanup'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// Called when the user leaves this section.</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+
+<span class="nx">users</span><span class="p">.</span><span class="nx">createRoute</span><span class="p">({</span>
+    <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'list'</span><span class="p">,</span>
+    <span class="s1">'template'</span><span class="o">:</span> <span class="nx">template</span><span class="p">,</span>
+    <span class="s1">'callback'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="p">},</span>
+    <span class="s1">'cleanup'</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="c1">// Called when the user leaves this route.</span>
+    <span class="p">}</span>
+<span class="p">});</span>
+</pre></div>
+
+<h3>
+<a name="one-more-thing" class="anchor" href="#one-more-thing"><span class="octicon octicon-link"></span></a>One More Thing</h3>
+
+<p>Once all of your sections and routes have been defined, you should call the following method:</p>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">edison</span><span class="p">.</span><span class="nx">initRoutes</span><span class="p">();</span>
+</pre></div>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<h3>
+<a name="bower" class="anchor" href="#bower"><span class="octicon octicon-link"></span></a>Bower</h3>
+
+<pre><code>$ bower install edisonjs
+</code></pre>
+
+<h2>
+<a name="configuration" class="anchor" href="#configuration"><span class="octicon octicon-link"></span></a>Configuration</h2>
+
+<p>Add the following options to your RequireJS configuration (adjust <code>location</code> as appropriate):</p>
+
+<div class="highlight highlight-javascript"><pre><span class="s1">'packages'</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>
+        <span class="s1">'name'</span><span class="o">:</span> <span class="s1">'edison'</span><span class="p">,</span>
+        <span class="s1">'location'</span><span class="o">:</span> <span class="s1">'/edison/dist/'</span><span class="p">,</span>
+        <span class="s1">'main'</span><span class="o">:</span> <span class="s1">'edison'</span>
+    <span class="p">}</span>
+<span class="p">]</span>
+</pre></div>
+
+<h2>
+<a name="license-mit" class="anchor" href="#license-mit"><span class="octicon octicon-link"></span></a>License (MIT)</h2>
+
+<pre><code>Permission is hereby granted, free of charge, to any person obtaining
+a copy of this software and associated documentation files (the
+'Software'), to deal in the Software without restriction, including
+without limitation the rights to use, copy, modify, merge, publish,
+distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to
+the following conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED 'AS IS', WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+</code></pre>
+      </section>
+      <footer>
+        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+		
+  </body>
+</html>
