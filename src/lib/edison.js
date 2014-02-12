@@ -65,8 +65,27 @@ define(function(require) {
 		'createSection': function(options) {
 			options = options || {};
 			_.defaults(options, {
-				'name': null
+				'name': null,
+				'callback': null,
+				'extend': {},
+				'cleanup': null
 			});
+			if ( !_.isString(options.name) || options.name === '' ) {
+				throw 'Invalid `name` specified.';
+			}
+			var name_check = options.name.replace(/\W/g, '');
+			if ( name_check !== options.name ) {
+				throw 'Invalid `name` specified.';
+			}
+			if ( !_.isFunction(options.callback) && !_.isNull(options.callback) ) {
+				throw 'Invalid `callback` specified.';
+			}
+			if ( !_.isObject(options.extend) ) {
+				throw 'Invalid `extend` value specified.';
+			}
+			if ( !_.isNull(options.cleanup) && !_.isFunction(options.cleanup) ) {
+				throw 'Invalid `cleanup` value specified.';
+			}
 			this.sections[options.name] = new Section(options, this);
 			return this.sections[options.name];
 		},

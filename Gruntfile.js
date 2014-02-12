@@ -50,6 +50,14 @@ module.exports = function(grunt) {
 					'mainConfigFile': 'require.config.build.js'
 				}
 			}
+		},
+		'mocha': {
+			'test': {
+				'options': {
+					'urls': ['http://localhost:3000/test/index.html'],
+					'run': false
+				}
+			}
 		}
     });
 
@@ -57,11 +65,14 @@ module.exports = function(grunt) {
     grunt.loadNpmTasks('grunt-contrib-watch');
     grunt.loadNpmTasks('grunt-express-server');
     grunt.loadNpmTasks('grunt-contrib-requirejs');
+	grunt.loadNpmTasks('grunt-mocha');
 
     // Default task(s).
     grunt.registerTask('default', ['uglify']);
 
     // Express server
     grunt.registerTask('server', ['express:dev', 'watch']);
+
+    // grunt.registerTask('test', ['express:dev', 'mocha']);
 
 };

@@ -21,6 +21,36 @@ define(function(require) {
 		self.cleanup = options.cleanup;
 		self.routes = {};
 
+		self.createRoute = function(options) {
+			options = options || {};
+			_.defaults(options, {
+				'name': null,
+				'callback': null,
+				'extend': {},
+				'cleanup': null
+			});
+			if ( !_.isString(options.name) || options.name === '' ) {
+				throw 'Invalid `name` specified.';
+			}
+			var name_check = options.name.replace(/\W/g, '');
+			if ( name_check !== options.name ) {
+				throw 'Invalid `name` specified.';
+			}
+			if ( !_.isFunction(options.callback) && !_.isNull(options.callback) ) {
+				throw 'Invalid `callback` specified.';
+			}
+			if ( !_.isObject(options.extend) ) {
+				throw 'Invalid `extend` value specified.';
+			}
+			if ( !_.isNull(options.cleanup) && !_.isFunction(options.cleanup) ) {
+				throw 'Invalid `cleanup` value specified.';
+			}
+			options.template_container_selector = '#child-route-container';
+			var route = new Route(options, self.api, edison);
+			self.routes[options.name] = route;
+			return route;
+		};
+
 		self.log = function() {
 			if ( !edison.getDebug() ) {
 				return;
@@ -37,12 +67,7 @@ define(function(require) {
 		self.sandbox = new Sandbox(this);
 
 		self.api = {
-			createRoute: function(options) {
-				options.template_container_selector = '#child-route-container';
-				var route = new Route(options, self.api, edison);
-				self.routes[options.name] = route;
-				return route;
-			},
+			createRoute: self.createRoute.bind(self),
 			getRoutes: function() {
 				return self.routes;
 			},

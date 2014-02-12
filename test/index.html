@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Edison.js - Tests</title>
+    <link rel="stylesheet" type="text/css" href="/vendor/mocha/mocha.css">
+    <script src="/vendor/mocha/mocha.js" type="text/javascript" charset="utf-8"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+	<script src="/config.js"></script>
+</head>
+<body>
+<div id="route_container"></div>
+<div id="mocha"></div>
+<div id="messages"></div>
+<div id="fixtures"></div>
+<script>
+mocha.setup('bdd');
+var tests = [
+	'test/edison'
+];
+mocha.setup('bdd');
+require(tests, function() {
+	mocha.run();
+});
+</script>
+</body>
+</html>
