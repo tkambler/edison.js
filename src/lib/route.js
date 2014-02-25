@@ -46,8 +46,25 @@ define(function(require) {
 		self.sandbox = new Sandbox();
 		self.sandbox.section = section.getSandbox();
 
-		self.init = function(fn) {
-			options.init.call(self.sandbox, fn);
+		self.init = function(id, fn) {
+			options.init.call(self.sandbox, function() {
+				if ( edison.getActiveSection() !== self.section ) {
+					// The user is making their first entry into this section.
+					self.log('Initial entry into section: ' + section.getName());
+					self.section.loadTemplate();
+					self.section.runCallback();
+					Sandbox.prototype.container = document.getElementById('route');
+					self.loadTemplate();
+				} else {
+					// The user is navigating within the same section.
+					Sandbox.prototype.container = document.getElementById('route');
+					self.loadTemplate();
+				}
+				edison.setActiveSection(self.section);
+				edison.setActiveRoute(self.api);
+				self.callback.call(self.sandbox, id);
+				fn();
+			});
 		};
 
 		_.each(self.extensions, function(fnc, extname) {
@@ -60,22 +77,8 @@ define(function(require) {
 			var tpl = document.createElement('div');
 			tpl.innerHTML = self.template;
 			tpl.setAttribute('id', 'section_' + self.section.getName() + '_route_' + self.name);
+			tpl.className = 'route';
 			edison.insertTemplate(tpl);
-		};
-
-		self.initRoute = function(id) {
-			self.loadTemplate();
-			Sandbox.prototype.container = document.getElementById('section_' + self.section.getName() + '_route_' + self.name);
-			if ( edison.getActiveSection() !== self.section ) {
-				// The user is making their first entry into this section.
-				self.log('Initial entry into section: ' + section.getName());
-				self.section.runCallback();
-			} else {
-				// The user is navigating within the same section.
-			}
-			edison.setActiveSection(self.section);
-			edison.setActiveRoute(self.api);
-			self.callback.call(self.sandbox, id);
 		};
 
 		/**
@@ -93,9 +96,6 @@ define(function(require) {
 			},
 			init: function() {
 				self.init.apply(self, arguments);
-			},
-			initRoute: function() {
-				self.initRoute.apply(self, arguments);
 			},
 			getTitle: function() {
 				return self.title;

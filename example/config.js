@@ -13,8 +13,8 @@ requirejs.config({
 	'packages': [
 		{
 			'name': 'edison',
-			'location': 'edison',
-			'main': 'edison'
+			'location': 'src',
+			'main': 'main'
 		}
 	]
 });

@@ -16,7 +16,7 @@ define(function(require) {
 		self.callback = options.callback;
 		self.extensions = options.extend;
 		self.parent_section = options.parent_section;
-		self.template = options.template;
+		self.template = options.template || "<div id='route'></div>";
 		self.templateData = options.templateData;
 		self.cleanup = options.cleanup;
 		self.routes = {};
@@ -45,7 +45,7 @@ define(function(require) {
 			if ( !_.isNull(options.cleanup) && !_.isFunction(options.cleanup) ) {
 				throw 'Invalid `cleanup` value specified.';
 			}
-			options.template_container_selector = '#child-route-container';
+			options.template_container_selector = '.route';
 			var route = new Route(options, self.api, edison);
 			self.routes[options.name] = route;
 			return route;
@@ -65,6 +65,14 @@ define(function(require) {
 		_.extend(Sandbox.prototype, self.extensions);
 
 		self.sandbox = new Sandbox(this);
+
+		self.loadTemplate = function() {
+			var tpl = document.createElement('div');
+			tpl.innerHTML = self.template;
+			tpl.setAttribute('id', 'edison_section');
+			tpl.className = 'section';
+			edison.insertSectionTemplate(tpl);
+		};
 
 		self.api = {
 			createRoute: self.createRoute.bind(self),
@@ -92,6 +100,7 @@ define(function(require) {
 				return self.controller;
 			},
 			runCallback: function() {
+				self.loadTemplate();
 				self.callback.call(self.sandbox);
 			},
 			getParentSection: function() {
@@ -104,6 +113,9 @@ define(function(require) {
 			},
 			getSandbox: function() {
 				return self.sandbox;
+			},
+			loadTemplate: function() {
+				return self.loadTemplate();
 			}
 		};
 

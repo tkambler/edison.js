@@ -70,8 +70,8 @@ define(function(require) {
 		},
 
 		'processHash': function(hash) {
-			if ( hash.indexOf('#') === 0 ) {
-				hash = hash.substring(1);
+			if ( hash.indexOf('#') === 0 && hash.indexOf('!') === 1 ) {
+				hash = hash.substring(2);
 			}
 			if ( hash === '' ) {
 				throw 'Invalid hash.';

@@ -3,7 +3,8 @@ define(function(require) {
 	var _ = require('underscore'),
 		Section = require('./section'),
 		Route = require('./route'),
-		Router = require('./router');
+		Router = require('./router'),
+		util = require('./util');
 
 	var Edison = function() {
 		this.init.apply(this, _.toArray(arguments));
@@ -21,6 +22,9 @@ define(function(require) {
 			options = options || {};
 			_.defaults(options, this.options);
 			this.options = options;
+			if ( !_.isBoolean(options.pushState) ) {
+				options.pushState = false;
+			}
 			if ( !options.container ) {
 				throw 'A value must be specified for `container.`';
 			} else {
@@ -28,14 +32,20 @@ define(function(require) {
 				if ( ! this.route_container ) {
 					throw 'Specified route container does not exist: `' + options.container + '.`';
 				}
+				if ( options.pushState && util.supportsHistoryAPI() ) {
+					this.enablePushState = true;
+				}
 			}
 		},
 
 		'options': {
-			'container': null
+			'container': null,
+			'pushState': false
 		},
 
 		'debug': false,
+
+		'enablePushState': false,
 
 		'routes_initialized': false,
 
@@ -162,11 +172,9 @@ define(function(require) {
 			}
 
 			this.checkParentSection(data.section_name);
-			route.init(function(err) {
+			route.init(data.route_id, function(err) {
 				if ( err ) {
 					// todo - ?
-				} else {
-					route.initRoute(data.route_id);
 				}
 			});
 		},
@@ -211,9 +219,15 @@ define(function(require) {
 			return this.Routes;
 		},
 
-		'insertTemplate': function(template) {
+		'insertSectionTemplate': function(template) {
 			this.route_container.innerHTML = '';
 			this.route_container.appendChild(template);
+		},
+
+		'insertTemplate': function(template) {
+			var container = document.getElementById('route');
+			container.innerHTML = '';
+			container.appendChild(template);
 		},
 
 		'extend': function(ext) {

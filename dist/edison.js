@@ -1412,8 +1412,25 @@ define('edison/lib/route',['require','underscore','./sandbox'],function(require)
 		self.sandbox = new Sandbox();
 		self.sandbox.section = section.getSandbox();
 
-		self.init = function(fn) {
-			options.init.call(self.sandbox, fn);
+		self.init = function(id, fn) {
+			options.init.call(self.sandbox, function() {
+				if ( edison.getActiveSection() !== self.section ) {
+					// The user is making their first entry into this section.
+					self.log('Initial entry into section: ' + section.getName());
+					self.section.loadTemplate();
+					self.section.runCallback();
+					Sandbox.prototype.container = document.getElementById('route');
+					self.loadTemplate();
+				} else {
+					// The user is navigating within the same section.
+					Sandbox.prototype.container = document.getElementById('route');
+					self.loadTemplate();
+				}
+				edison.setActiveSection(self.section);
+				edison.setActiveRoute(self.api);
+				self.callback.call(self.sandbox, id);
+				fn();
+			});
 		};
 
 		_.each(self.extensions, function(fnc, extname) {
@@ -1426,22 +1443,8 @@ define('edison/lib/route',['require','underscore','./sandbox'],function(require)
 			var tpl = document.createElement('div');
 			tpl.innerHTML = self.template;
 			tpl.setAttribute('id', 'section_' + self.section.getName() + '_route_' + self.name);
+			tpl.className = 'route';
 			edison.insertTemplate(tpl);
-		};
-
-		self.initRoute = function(id) {
-			self.loadTemplate();
-			Sandbox.prototype.container = document.getElementById('section_' + self.section.getName() + '_route_' + self.name);
-			if ( edison.getActiveSection() !== self.section ) {
-				// The user is making their first entry into this section.
-				self.log('Initial entry into section: ' + section.getName());
-				self.section.runCallback();
-			} else {
-				// The user is navigating within the same section.
-			}
-			edison.setActiveSection(self.section);
-			edison.setActiveRoute(self.api);
-			self.callback.call(self.sandbox, id);
 		};
 
 		/**
@@ -1459,9 +1462,6 @@ define('edison/lib/route',['require','underscore','./sandbox'],function(require)
 			},
 			init: function() {
 				self.init.apply(self, arguments);
-			},
-			initRoute: function() {
-				self.initRoute.apply(self, arguments);
 			},
 			getTitle: function() {
 				return self.title;
@@ -1513,10 +1513,40 @@ define('edison/lib/section',['require','underscore','./route','./sandbox'],funct
 		self.callback = options.callback;
 		self.extensions = options.extend;
 		self.parent_section = options.parent_section;
-		self.template = options.template;
+		self.template = options.template || "<div id='route'></div>";
 		self.templateData = options.templateData;
 		self.cleanup = options.cleanup;
 		self.routes = {};
+
+		self.createRoute = function(options) {
+			options = options || {};
+			_.defaults(options, {
+				'name': null,
+				'callback': null,
+				'extend': {},
+				'cleanup': null
+			});
+			if ( !_.isString(options.name) || options.name === '' ) {
+				throw 'Invalid `name` specified.';
+			}
+			var name_check = options.name.replace(/\W/g, '');
+			if ( name_check !== options.name ) {
+				throw 'Invalid `name` specified.';
+			}
+			if ( !_.isFunction(options.callback) && !_.isNull(options.callback) ) {
+				throw 'Invalid `callback` specified.';
+			}
+			if ( !_.isObject(options.extend) ) {
+				throw 'Invalid `extend` value specified.';
+			}
+			if ( !_.isNull(options.cleanup) && !_.isFunction(options.cleanup) ) {
+				throw 'Invalid `cleanup` value specified.';
+			}
+			options.template_container_selector = '.route';
+			var route = new Route(options, self.api, edison);
+			self.routes[options.name] = route;
+			return route;
+		};
 
 		self.log = function() {
 			if ( !edison.getDebug() ) {
@@ -1533,13 +1563,16 @@ define('edison/lib/section',['require','underscore','./route','./sandbox'],funct
 
 		self.sandbox = new Sandbox(this);
 
+		self.loadTemplate = function() {
+			var tpl = document.createElement('div');
+			tpl.innerHTML = self.template;
+			tpl.setAttribute('id', 'edison_section');
+			tpl.className = 'section';
+			edison.insertSectionTemplate(tpl);
+		};
+
 		self.api = {
-			createRoute: function(options) {
-				options.template_container_selector = '#child-route-container';
-				var route = new Route(options, self.api, edison);
-				self.routes[options.name] = route;
-				return route;
-			},
+			createRoute: self.createRoute.bind(self),
 			getRoutes: function() {
 				return self.routes;
 			},
@@ -1564,6 +1597,7 @@ define('edison/lib/section',['require','underscore','./route','./sandbox'],funct
 				return self.controller;
 			},
 			runCallback: function() {
+				self.loadTemplate();
 				self.callback.call(self.sandbox);
 			},
 			getParentSection: function() {
@@ -1576,6 +1610,9 @@ define('edison/lib/section',['require','underscore','./route','./sandbox'],funct
 			},
 			getSandbox: function() {
 				return self.sandbox;
+			},
+			loadTemplate: function() {
+				return self.loadTemplate();
 			}
 		};
 
@@ -1659,8 +1696,8 @@ define('edison/lib/router',['require','underscore','./microevent'],function(requ
 		},
 
 		'processHash': function(hash) {
-			if ( hash.indexOf('#') === 0 ) {
-				hash = hash.substring(1);
+			if ( hash.indexOf('#') === 0 && hash.indexOf('!') === 1 ) {
+				hash = hash.substring(2);
 			}
 			if ( hash === '' ) {
 				throw 'Invalid hash.';
@@ -1708,12 +1745,28 @@ define('edison/lib/router',['require','underscore','./microevent'],function(requ
 
 });
 
-define('edison/lib/edison',['require','underscore','./section','./route','./router'],function(require) {
+define('edison/lib/util',[], function() {
+
+	return {
+
+		/**
+		 * Returns true / false as to whether the browser supports the HTML5 History API
+		 */
+		'supportsHistoryAPI': function() {
+			return !!(window.history && history.pushState);
+		}
+
+	};
+
+});
+
+define('edison/lib/edison',['require','underscore','./section','./route','./router','./util'],function(require) {
 
 	var _ = require('underscore'),
 		Section = require('./section'),
 		Route = require('./route'),
-		Router = require('./router');
+		Router = require('./router'),
+		util = require('./util');
 
 	var Edison = function() {
 		this.init.apply(this, _.toArray(arguments));
@@ -1731,6 +1784,9 @@ define('edison/lib/edison',['require','underscore','./section','./route','./rout
 			options = options || {};
 			_.defaults(options, this.options);
 			this.options = options;
+			if ( !_.isBoolean(options.pushState) ) {
+				options.pushState = false;
+			}
 			if ( !options.container ) {
 				throw 'A value must be specified for `container.`';
 			} else {
@@ -1738,14 +1794,20 @@ define('edison/lib/edison',['require','underscore','./section','./route','./rout
 				if ( ! this.route_container ) {
 					throw 'Specified route container does not exist: `' + options.container + '.`';
 				}
+				if ( options.pushState && util.supportsHistoryAPI() ) {
+					this.enablePushState = true;
+				}
 			}
 		},
 
 		'options': {
-			'container': null
+			'container': null,
+			'pushState': false
 		},
 
 		'debug': false,
+
+		'enablePushState': false,
 
 		'routes_initialized': false,
 
@@ -1775,8 +1837,27 @@ define('edison/lib/edison',['require','underscore','./section','./route','./rout
 		'createSection': function(options) {
 			options = options || {};
 			_.defaults(options, {
-				'name': null
+				'name': null,
+				'callback': null,
+				'extend': {},
+				'cleanup': null
 			});
+			if ( !_.isString(options.name) || options.name === '' ) {
+				throw 'Invalid `name` specified.';
+			}
+			var name_check = options.name.replace(/\W/g, '');
+			if ( name_check !== options.name ) {
+				throw 'Invalid `name` specified.';
+			}
+			if ( !_.isFunction(options.callback) && !_.isNull(options.callback) ) {
+				throw 'Invalid `callback` specified.';
+			}
+			if ( !_.isObject(options.extend) ) {
+				throw 'Invalid `extend` value specified.';
+			}
+			if ( !_.isNull(options.cleanup) && !_.isFunction(options.cleanup) ) {
+				throw 'Invalid `cleanup` value specified.';
+			}
 			this.sections[options.name] = new Section(options, this);
 			return this.sections[options.name];
 		},
@@ -1853,11 +1934,9 @@ define('edison/lib/edison',['require','underscore','./section','./route','./rout
 			}
 
 			this.checkParentSection(data.section_name);
-			route.init(function(err) {
+			route.init(data.route_id, function(err) {
 				if ( err ) {
 					// todo - ?
-				} else {
-					route.initRoute(data.route_id);
 				}
 			});
 		},
@@ -1902,9 +1981,15 @@ define('edison/lib/edison',['require','underscore','./section','./route','./rout
 			return this.Routes;
 		},
 
-		'insertTemplate': function(template) {
+		'insertSectionTemplate': function(template) {
 			this.route_container.innerHTML = '';
 			this.route_container.appendChild(template);
+		},
+
+		'insertTemplate': function(template) {
+			var container = document.getElementById('route');
+			container.innerHTML = '';
+			container.appendChild(template);
 		},
 
 		'extend': function(ext) {

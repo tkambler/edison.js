@@ -22,6 +22,7 @@ require(['edison'], function(Edison) {
 
 	var dashboard = edison.createSection({
 		'name': 'dashboard',
+		'template': "<div>Section template. <div id='route' style='border: 1px solid green;'></div></div>",
 		'callback': function() {
 			console.log('I am the dashboard section.');
 			this.test();
@@ -52,12 +53,9 @@ require(['edison'], function(Edison) {
 			this.herp();
 			console.log('test', this.get('test'));
 			console.log('container', this.container);
+			console.log('this.container', this.container, this);
 			this.container.innerHTML = 'aaah!';
 			this.test();
-
-			this.setInterval(function() {
-				console.log('hello');
-			}, 4000);
 
 			console.log('this', this);
 			console.log('name2', this.section.name);
@@ -74,6 +72,7 @@ require(['edison'], function(Edison) {
 
 	dashboard.createRoute({
 		'name': 'test',
+		'template': "<div>123 - test</div>",
 		'callback': function() {
 			console.log('I am the dashboard/test route.');
 			this.test();
@@ -100,6 +99,7 @@ require(['edison'], function(Edison) {
 
 	users.createRoute({
 		'name': 'index',
+		'template': "<div>users/index</div>",
 		'callback': function() {
 			console.log('I am the users/index route.');
 		},
